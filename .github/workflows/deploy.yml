@@ -1,0 +1,26 @@
+name: Deploy to Netlify
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download existing site files
+        run: |
+          curl -L -o index.html https://clawoperator.netlify.app/index.html
+          curl -L -o chatbot.js https://clawoperator.netlify.app/chatbot.js
+          curl -L -o robots.txt https://clawoperator.netlify.app/robots.txt
+          curl -L -o sitemap.xml https://clawoperator.netlify.app/sitemap.xml
+          curl -L -o 403.html https://clawoperator.netlify.app/403.html
+          curl -L -o 404.html https://clawoperator.netlify.app/404.html
+      - name: Deploy to Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: a84d5c06-01cc-4d43-a81b-2e14d19bbdad
+        run: |
+          npm install -g netlify-cli
+          netlify deploy --dir=. --prod --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
